@@ -55,8 +55,8 @@ def run_backtest(
     rets = returns_series.dropna().sort_index()
     common = sig.index.intersection(rets.index)
     if len(common) < 10:
-        raise ResearchError(
-            f"Insufficient overlapping data: {len(common)} days",
+        raise ValueError(
+            f"Insufficient overlapping data: {len(common)} days (need at least 10)"
         )
     sig = sig[common]
     rets = rets[common]

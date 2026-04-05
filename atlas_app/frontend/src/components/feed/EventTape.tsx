@@ -11,6 +11,7 @@ import { AlertTriangle, Flame, Cloud, Ship, Globe, Zap, RefreshCw } from "lucide
 import { eventsApi, type AtlasAlertRecord } from "../../api/client";
 import { useAlertStore, useWorkspaceStore } from "../../store";
 import { cn, domainColor, relativeTime, severityColor } from "../../lib/utils";
+import { ApiErrorBanner } from "../layout/ApiErrorBanner";
 
 const DOMAIN_ICONS: Record<string, React.ReactNode> = {
   energy: <Zap size={12} />,
@@ -33,7 +34,7 @@ export function EventTape() {
   const { alerts: liveAlerts } = useAlertStore();
   const { setDrilldownTarget } = useWorkspaceStore();
 
-  const { data, isLoading, refetch, isFetching } = useQuery({
+  const { data, isLoading, error, refetch, isFetching } = useQuery({
     queryKey: ["alerts", filter, minSeverity],
     queryFn: () =>
       eventsApi.getAlerts(
@@ -42,6 +43,7 @@ export function EventTape() {
         100
       ),
     refetchInterval: 30_000,
+    retry: 1,
   });
 
   const storedAlerts: AtlasAlertRecord[] = data?.data ?? [];
@@ -66,6 +68,17 @@ export function EventTape() {
           new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
       );
   }, [liveAlerts, storedAlerts, filter, minSeverity]);
+
+  if (error && storedAlerts.length === 0) {
+    return (
+      <ApiErrorBanner
+        panel="Event Tape"
+        message="Could not load alerts"
+        error={error}
+        onRetry={() => refetch()}
+      />
+    );
+  }
 
   return (
     <div className="h-full flex flex-col bg-atlas-surface">

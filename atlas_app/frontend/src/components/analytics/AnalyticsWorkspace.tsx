@@ -16,6 +16,7 @@ import { energyApi, eventsApi, weatherApi } from "../../api/client";
 import { useWorkspaceStore } from "../../store";
 import { cn, formatNumber, signalColor } from "../../lib/utils";
 import { DrilldownPanel } from "../drilldown/CausalDrilldown";
+import { ApiErrorBanner } from "../layout/ApiErrorBanner";
 
 type Tab = "storage" | "weather" | "composite";
 
@@ -64,14 +65,16 @@ export function AnalyticsWorkspace() {
 function StorageTab() {
   const [commodity, setCommodity] = useState<"crude" | "natgas">("crude");
 
-  const { data: histData } = useQuery({
+  const { data: histData, error: histError, refetch: refetchHist } = useQuery({
     queryKey: ["surprise-history", commodity],
     queryFn: () => energyApi.getSurpriseHistory(commodity, "US", 52),
+    retry: 1,
   });
 
-  const { data: surprise } = useQuery({
+  const { data: surprise, error: surpriseError } = useQuery({
     queryKey: ["storage-surprise", commodity],
     queryFn: () => energyApi.getStorageSurprise(commodity, "US"),
+    retry: 1,
   });
 
   const chartData = (histData?.data ?? []).slice().reverse().map((r) => ({
@@ -82,6 +85,17 @@ function StorageTab() {
   }));
 
   const sig = surprise;
+
+  if (histError && surpriseError) {
+    return (
+      <ApiErrorBanner
+        panel="Storage"
+        message="Could not load storage data"
+        error={histError}
+        onRetry={() => refetchHist()}
+      />
+    );
+  }
 
   return (
     <div className="space-y-4">
@@ -144,22 +158,35 @@ function StorageTab() {
 }
 
 function WeatherTab() {
-  const { data: weatherRisk } = useQuery({
+  const { data: weatherRisk, error: weatherError, refetch: refetchWeather } = useQuery({
     queryKey: ["weather-risk"],
     queryFn: weatherApi.getWeatherRiskScore,
     refetchInterval: 15 * 60 * 1000,
+    retry: 1,
   });
 
   const { data: kIndex } = useQuery({
     queryKey: ["k-index"],
     queryFn: weatherApi.getKIndex,
     refetchInterval: 5 * 60 * 1000,
+    retry: 1,
   });
 
   const kData = (kIndex?.data ?? []).slice(-48).map((r) => ({
     time: r.timestamp.slice(11, 16),
     k: r.k_index,
   }));
+
+  if (weatherError) {
+    return (
+      <ApiErrorBanner
+        panel="Weather"
+        message="Could not load weather data"
+        error={weatherError}
+        onRetry={() => refetchWeather()}
+      />
+    );
+  }
 
   return (
     <div className="space-y-4">

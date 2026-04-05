@@ -12,7 +12,7 @@ No authentication required.
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Optional
 
 from loguru import logger
@@ -173,8 +173,8 @@ def _parse_forecast(
                 periods.append(
                     ForecastPeriod(
                         name=p.get("name", ""),
-                        start_time=_parse_dt(p.get("startTime")) or datetime.utcnow(),
-                        end_time=_parse_dt(p.get("endTime")) or datetime.utcnow(),
+                        start_time=_parse_dt(p.get("startTime")) or datetime.now(timezone.utc),
+                        end_time=_parse_dt(p.get("endTime")) or datetime.now(timezone.utc),
                         is_daytime=bool(p.get("isDaytime", True)),
                         temperature_f=float(p.get("temperature", 0)),
                         wind_speed=str(p.get("windSpeed", "")),

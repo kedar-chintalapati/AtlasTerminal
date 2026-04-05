@@ -147,7 +147,11 @@ class DuckDBStore:
             self.conn.execute(
                 f"CREATE TABLE IF NOT EXISTS {table_name} AS SELECT * FROM __tmp_write__ WHERE 1=0"
             )
-            self.conn.execute(f"INSERT INTO {table_name} SELECT * FROM __tmp_write__")
+            # Use column-aware INSERT so partial schemas (fewer cols than DDL) work.
+            cols = ", ".join(df.columns.tolist())
+            self.conn.execute(
+                f"INSERT INTO {table_name} ({cols}) SELECT {cols} FROM __tmp_write__"
+            )
             self.conn.unregister("__tmp_write__")
 
             logger.debug(f"Wrote {len(df)} rows to '{table_name}'")
@@ -176,11 +180,8 @@ class DuckDBStore:
             rel = self.conn.execute(sql, params or [])
             return rel.df()
         except duckdb.CatalogException as exc:
-            # Try to extract table name from error message
             msg = str(exc)
-            if "Table" in msg or "table" in msg:
-                raise StoreTableNotFoundError(table=msg, message=msg) from exc
-            raise StoreError(f"DuckDB query error: {exc}", sql=sql[:200]) from exc
+            raise StoreError(f"DuckDB query error: {msg}", sql=sql[:200]) from exc
         except Exception as exc:
             raise StoreError(f"DuckDB error: {exc}", sql=sql[:200]) from exc
 

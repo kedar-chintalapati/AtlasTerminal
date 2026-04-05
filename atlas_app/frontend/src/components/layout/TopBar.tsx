@@ -1,6 +1,7 @@
 import React from "react";
-import { Activity, Bell, Settings, Zap, BarChart2, Map, Terminal } from "lucide-react";
+import { Activity, Bell, Settings, Zap, BarChart2, Map, Terminal, ServerOff } from "lucide-react";
 import { useAlertStore, useWorkspaceStore } from "../../store";
+import { useBackendHealth } from "../../hooks/useBackendHealth";
 import { cn } from "../../lib/utils";
 
 interface Props {
@@ -10,6 +11,7 @@ interface Props {
 export function TopBar({ onSettings }: Props) {
   const { unreadCount, wsConnected, markRead } = useAlertStore();
   const { layout, setLayout } = useWorkspaceStore();
+  const { online: backendOnline, checking: backendChecking } = useBackendHealth();
 
   const layouts = [
     { id: "quad", label: "4-Panel", icon: <Zap size={14} /> },
@@ -49,6 +51,17 @@ export function TopBar({ onSettings }: Props) {
       </div>
 
       <div className="flex-1" />
+
+      {/* Backend health */}
+      {!backendChecking && !backendOnline && (
+        <div
+          className="flex items-center gap-1.5 text-xs text-red-400 bg-red-900/30 border border-red-800 rounded px-2 py-0.5"
+          title="Backend server is not reachable. Run: python -m atlas_app.backend.main"
+        >
+          <ServerOff size={12} />
+          Backend offline
+        </div>
+      )}
 
       {/* WS status */}
       <div className="flex items-center gap-1.5 text-xs text-atlas-muted">

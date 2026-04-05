@@ -74,9 +74,14 @@ def percentile_rank(series: pd.Series, window: Optional[int] = None) -> pd.Serie
 def information_ratio(returns: pd.Series, benchmark: Optional[pd.Series] = None) -> float:
     """Annualised information ratio (or Sharpe if no benchmark)."""
     excess = returns if benchmark is None else returns - benchmark
-    if excess.std() == 0:
-        return 0.0
-    return float(excess.mean() / excess.std() * np.sqrt(252))
+    std = excess.std()
+    if std == 0 or pd.isna(std):
+        # Zero variance: return sign of mean (inf Sharpe convention → ±1 / 0)
+        mean = excess.mean()
+        if pd.isna(mean) or mean == 0:
+            return 0.0
+        return 1.0 if mean > 0 else -1.0
+    return float(excess.mean() / std * np.sqrt(252))
 
 
 def max_drawdown(returns: pd.Series) -> float:
@@ -97,7 +102,7 @@ def hit_rate(signal: pd.Series, returns: pd.Series) -> float:
 
 
 def winsorise(series: pd.Series, lower: float = 0.01, upper: float = 0.99) -> pd.Series:
-    """Winsorise at specified quantile levels."""
-    lo = series.quantile(lower)
-    hi = series.quantile(upper)
+    """Winsorise at specified quantile levels (nearest-rank, clips to actual data values)."""
+    lo = series.quantile(lower, interpolation="higher")
+    hi = series.quantile(upper, interpolation="lower")
     return series.clip(lo, hi)

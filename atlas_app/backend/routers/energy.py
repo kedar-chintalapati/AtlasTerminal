@@ -62,7 +62,7 @@ async def gas_storage(
 
 @router.get("/storage/surprise")
 async def storage_surprise(
-    commodity: str = Query("crude", regex="^(crude|natgas)$"),
+    commodity: str = Query("crude", pattern="^(crude|natgas)$"),
     region: str = Query("US"),
     store: DuckDBStore = Depends(get_store),
 ) -> dict:
@@ -86,7 +86,7 @@ async def storage_surprise(
 
 @router.get("/storage/surprises/history")
 async def storage_surprise_history(
-    commodity: str = Query("crude", regex="^(crude|natgas)$"),
+    commodity: str = Query("crude", pattern="^(crude|natgas)$"),
     region: str = Query("US"),
     limit: int = Query(52, ge=1, le=500),
     store: DuckDBStore = Depends(get_store),

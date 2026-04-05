@@ -26,6 +26,7 @@ import { AnalyticsWorkspace } from "./components/analytics/AnalyticsWorkspace";
 import { EventTape } from "./components/feed/EventTape";
 import { NotebookPanel } from "./components/notebook/NotebookPanel";
 import { SettingsModal } from "./components/layout/SettingsModal";
+import { ErrorBoundary } from "./components/layout/ErrorBoundary";
 import { useAlertWebSocket } from "./hooks/useWebSocket";
 import { useWorkspaceStore } from "./store";
 
@@ -59,11 +60,15 @@ function QuadLayout() {
       <Panel defaultSize={60} minSize={30}>
         <PanelGroup direction="vertical" className="h-full">
           <Panel defaultSize={65} minSize={20}>
-            <AtlasMap />
+            <ErrorBoundary name="Map">
+              <AtlasMap />
+            </ErrorBoundary>
           </Panel>
           <PanelResizeHandle className="h-1 cursor-row-resize hover:bg-blue-600 transition-colors bg-atlas-border" />
           <Panel defaultSize={35} minSize={15}>
-            <NotebookPanel />
+            <ErrorBoundary name="Research Notebook">
+              <NotebookPanel />
+            </ErrorBoundary>
           </Panel>
         </PanelGroup>
       </Panel>
@@ -74,11 +79,15 @@ function QuadLayout() {
       <Panel defaultSize={40} minSize={20}>
         <PanelGroup direction="vertical" className="h-full">
           <Panel defaultSize={55} minSize={20}>
-            <AnalyticsWorkspace />
+            <ErrorBoundary name="Analytics Workspace">
+              <AnalyticsWorkspace />
+            </ErrorBoundary>
           </Panel>
           <PanelResizeHandle className="h-1 cursor-row-resize hover:bg-blue-600 transition-colors bg-atlas-border" />
           <Panel defaultSize={45} minSize={15}>
-            <EventTape />
+            <ErrorBoundary name="Event Tape">
+              <EventTape />
+            </ErrorBoundary>
           </Panel>
         </PanelGroup>
       </Panel>
@@ -90,17 +99,23 @@ function MapFocusLayout() {
   return (
     <PanelGroup direction="horizontal" className="h-full">
       <Panel defaultSize={75} minSize={50}>
-        <AtlasMap />
+        <ErrorBoundary name="Map">
+          <AtlasMap />
+        </ErrorBoundary>
       </Panel>
       <PanelResizeHandle className="w-1 cursor-col-resize hover:bg-blue-600 transition-colors bg-atlas-border" />
       <Panel defaultSize={25} minSize={15}>
         <PanelGroup direction="vertical" className="h-full">
           <Panel defaultSize={50}>
-            <AnalyticsWorkspace />
+            <ErrorBoundary name="Analytics Workspace">
+              <AnalyticsWorkspace />
+            </ErrorBoundary>
           </Panel>
           <PanelResizeHandle className="h-1 cursor-row-resize hover:bg-blue-600 transition-colors bg-atlas-border" />
           <Panel defaultSize={50}>
-            <EventTape />
+            <ErrorBoundary name="Event Tape">
+              <EventTape />
+            </ErrorBoundary>
           </Panel>
         </PanelGroup>
       </Panel>
@@ -112,15 +127,21 @@ function AnalyticsFocusLayout() {
   return (
     <PanelGroup direction="horizontal" className="h-full">
       <Panel defaultSize={40} minSize={20}>
-        <AtlasMap />
+        <ErrorBoundary name="Map">
+          <AtlasMap />
+        </ErrorBoundary>
       </Panel>
       <PanelResizeHandle className="w-1 cursor-col-resize hover:bg-blue-600 transition-colors bg-atlas-border" />
       <Panel defaultSize={35} minSize={20}>
-        <AnalyticsWorkspace />
+        <ErrorBoundary name="Analytics Workspace">
+          <AnalyticsWorkspace />
+        </ErrorBoundary>
       </Panel>
       <PanelResizeHandle className="w-1 cursor-col-resize hover:bg-blue-600 transition-colors bg-atlas-border" />
       <Panel defaultSize={25} minSize={15}>
-        <EventTape />
+        <ErrorBoundary name="Event Tape">
+          <EventTape />
+        </ErrorBoundary>
       </Panel>
     </PanelGroup>
   );
@@ -130,15 +151,21 @@ function NotebookFocusLayout() {
   return (
     <PanelGroup direction="horizontal" className="h-full">
       <Panel defaultSize={50} minSize={30}>
-        <NotebookPanel />
+        <ErrorBoundary name="Research Notebook">
+          <NotebookPanel />
+        </ErrorBoundary>
       </Panel>
       <PanelResizeHandle className="w-1 cursor-col-resize hover:bg-blue-600 transition-colors bg-atlas-border" />
       <Panel defaultSize={30} minSize={20}>
-        <AtlasMap />
+        <ErrorBoundary name="Map">
+          <AtlasMap />
+        </ErrorBoundary>
       </Panel>
       <PanelResizeHandle className="w-1 cursor-col-resize hover:bg-blue-600 transition-colors bg-atlas-border" />
       <Panel defaultSize={20} minSize={15}>
-        <EventTape />
+        <ErrorBoundary name="Event Tape">
+          <EventTape />
+        </ErrorBoundary>
       </Panel>
     </PanelGroup>
   );

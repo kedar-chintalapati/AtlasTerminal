@@ -286,11 +286,13 @@ def _parse_crude_storage(df: pd.DataFrame) -> list[CrudeStorageRecord]:
         area_code = str(row.get("area", "NUS"))
         region = region_map.get(area_code, area_code)
         try:
+            val = row.get("value")
+            stocks = 0.0 if (val is None or pd.isna(val)) else float(val)
             records.append(
                 CrudeStorageRecord(
                     report_date=str(row.get("period", ""))[:10],
                     region=region,
-                    stocks_mmbbl=float(row.get("value", 0) or 0),
+                    stocks_mmbbl=stocks,
                 )
             )
         except Exception as exc:

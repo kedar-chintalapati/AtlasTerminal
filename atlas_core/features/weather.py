@@ -114,7 +114,7 @@ def compute_population_weighted_hdd_cdd(
 
 def score_weather_risk_for_asset(
     asset: PhysicalAsset,
-    active_alerts: list[NWSAlert],
+    alerts: list[NWSAlert],
     radius_km: float = 150.0,
     extreme_temp_f_high: float = 100.0,
     extreme_temp_f_low: float = 15.0,
@@ -142,7 +142,7 @@ def score_weather_risk_for_asset(
     alert_score = 0.0
     storm_proximity_km: Optional[float] = None
 
-    for alert in active_alerts:
+    for alert in alerts:
         if alert.centroid_lat is None or alert.centroid_lon is None:
             continue
         dist = haversine_km(asset.lat, asset.lon, alert.centroid_lat, alert.centroid_lon)
@@ -165,11 +165,12 @@ def score_weather_risk_for_asset(
 
     # Check for wind alerts
     wind_events = {"High Wind Warning", "Wind Advisory", "High Wind Watch"}
-    high_wind = any(a.event_type in wind_events for a in active_alerts if a.alert_id in relevant_alerts)
+    high_wind = any(a.event_type in wind_events for a in alerts if a.alert_id in relevant_alerts)
 
     # Final composite score
     score = min(1.0, alert_score + (0.2 if extreme_temp else 0.0) + (0.15 if high_wind else 0.0))
 
+    from datetime import timezone
     return WeatherRiskScore(
         asset_id=asset.asset_id,
         asset_type=asset.asset_type.value,
@@ -180,7 +181,7 @@ def score_weather_risk_for_asset(
         storm_proximity_km=storm_proximity_km,
         extreme_temp_flag=extreme_temp,
         high_wind_flag=high_wind,
-        computed_at=datetime.utcnow(),
+        computed_at=datetime.now(timezone.utc),
     )
 
 
