@@ -18,6 +18,10 @@ class BackendSettings(BaseSettings):
     api_prefix: str = Field(default="/api/v1")
     log_level: str = Field(default="info")
 
+    @property
+    def log_level_lower(self) -> str:
+        return self.log_level.lower()
+
     # Scheduler intervals (seconds)
     energy_refresh_interval: int = Field(default=3600)       # 1h
     weather_refresh_interval: int = Field(default=900)       # 15m

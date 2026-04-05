@@ -202,5 +202,5 @@ if __name__ == "__main__":
         host=backend_settings.host,
         port=backend_settings.port,
         reload=False,  # reload breaks static file mounts and the browser-open thread
-        log_level=backend_settings.log_level,
+        log_level=backend_settings.log_level_lower,
     )
