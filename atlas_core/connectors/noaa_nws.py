@@ -46,10 +46,11 @@ class NWSConnector(BaseConnector):
         area: Optional[str] = None,         # state code e.g. "TX"
         event: Optional[str] = None,        # "Tornado Warning"
         severity: Optional[str] = None,     # "Extreme"
-        limit: int = 500,
+        limit: int = 500,                   # kept for API compat, NWS ignores it
     ) -> list[NWSAlert]:
         """Fetch all currently active NWS alerts, optionally filtered."""
-        params: dict[str, Any] = {"limit": limit}
+        # NWS does NOT support a ?limit param — omit it entirely
+        params: dict[str, Any] = {}
         if area:
             params["area"] = area
         if event:

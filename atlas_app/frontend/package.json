@@ -11,6 +11,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@deck.gl/aggregation-layers": "^9.2.11",
     "@deck.gl/core": "^9.0.0",
     "@deck.gl/extensions": "^9.0.0",
     "@deck.gl/geo-layers": "^9.0.0",
@@ -18,8 +19,8 @@
     "@deck.gl/react": "^9.0.0",
     "@finos/perspective": "^2.9.0",
     "@finos/perspective-viewer": "^2.9.0",
-    "@finos/perspective-viewer-datagrid": "^2.9.0",
     "@finos/perspective-viewer-d3fc": "^2.9.0",
+    "@finos/perspective-viewer-datagrid": "^2.9.0",
     "@tanstack/react-query": "^5.40.0",
     "@tanstack/react-query-devtools": "^5.40.0",
     "clsx": "^2.1.1",

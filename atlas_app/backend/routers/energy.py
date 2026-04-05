@@ -66,7 +66,7 @@ async def storage_surprise(
     region: str = Query("US"),
     store: DuckDBStore = Depends(get_store),
 ) -> dict:
-    """Latest storage surprise signal."""
+    """Latest storage surprise signal. Returns neutral when no data is loaded yet."""
     try:
         from atlas_core.signals.storage_surprise import StorageSurpriseSignal
         sig = StorageSurpriseSignal(commodity=commodity, region=region, store=store)
@@ -80,8 +80,16 @@ async def storage_surprise(
             "components": [c.model_dump() for c in result.components],
         }
     except Exception as exc:
-        logger.warning(f"Storage surprise failed: {exc}")
-        raise HTTPException(status_code=500, detail=str(exc)) from exc
+        logger.warning(f"Storage surprise unavailable ({commodity}/{region}): {exc}")
+        # Return neutral signal instead of error — data hasn't loaded yet
+        return {
+            "signal_name": f"{commodity}_storage_surprise",
+            "value": 0.0,
+            "direction": "neutral",
+            "confidence": 0.0,
+            "metadata": {"info": "No data loaded. Add EIA_API_KEY to .env to enable storage signals.", "commodity": commodity, "region": region},
+            "components": [],
+        }
 
 
 @router.get("/storage/surprises/history")

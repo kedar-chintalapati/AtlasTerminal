@@ -15,7 +15,7 @@ export function useBackendHealth() {
   const { data, isError, isFetching } = useQuery<HealthResponse>({
     queryKey: ["backend-health"],
     queryFn: async () => {
-      const res = await fetch("/api/v1/health");
+      const res = await fetch("/health");
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return res.json();
     },

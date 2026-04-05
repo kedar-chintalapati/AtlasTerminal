@@ -213,17 +213,19 @@ export function AtlasMap() {
         controller={true}
         layers={layers}
         onViewStateChange={onViewStateChange as any}
-        getTooltip={({ object }) => {
+        getTooltip={(info: any) => {
+          const { object } = info;
           if (!object || !object.properties) return null;
           const p = object.properties as Record<string, unknown>;
+          const lines = [
+            `<strong>${p.name || p.title || p.mmsi || "Feature"}</strong>`,
+            p.type ? `<span style="color:#94a3b8">${p.type}</span>` : "",
+            p.speed ? `Speed: ${(p.speed as number).toFixed(1)} kts` : "",
+            p.score ? `Score: ${(p.score as number).toFixed(2)}` : "",
+          ].filter(Boolean).join("<br/>");
           return {
-            html: `<div class="bg-atlas-surface text-atlas-text p-2 rounded text-xs border border-atlas-border max-w-xs">
-              <strong>${p.name || p.title || p.mmsi || "Feature"}</strong>
-              ${p.type ? `<br/><span class="text-atlas-muted">${p.type}</span>` : ""}
-              ${p.speed ? `<br/>Speed: ${(p.speed as number).toFixed(1)} kts` : ""}
-              ${p.score ? `<br/>Score: ${(p.score as number).toFixed(2)}` : ""}
-            </div>`,
-            style: { background: "transparent", border: "none", padding: 0 },
+            html: `<div style="background:#1e2433;border:1px solid #252a35;padding:8px;border-radius:4px;font-size:11px;color:#e2e8f0;max-width:200px">${lines}</div>`,
+            style: { background: "transparent", border: "none", padding: "0" } as Partial<CSSStyleDeclaration>,
           };
         }}
       >

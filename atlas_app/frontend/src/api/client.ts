@@ -7,7 +7,7 @@
 
 const BASE = "/api/v1";
 
-async function get<T>(path: string, params?: Record<string, string | number | boolean>): Promise<T> {
+async function get<T>(path: string, params?: Record<string, string | number | boolean | undefined | null>): Promise<T> {
   const url = new URL(BASE + path, window.location.origin);
   if (params) {
     for (const [k, v] of Object.entries(params)) {

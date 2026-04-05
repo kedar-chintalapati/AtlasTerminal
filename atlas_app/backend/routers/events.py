@@ -22,9 +22,12 @@ router = APIRouter(prefix="/events", tags=["events"])
 async def fires_gulf_coast(
     days: int = Query(3, ge=1, le=10),
 ) -> dict:
-    """NASA FIRMS fire detections in the Gulf Coast energy corridor."""
+    """NASA FIRMS fire detections in the Gulf Coast energy corridor.
+    Returns empty list (not an error) when NASA_FIRMS_MAP_KEY is not configured.
+    Get a free key at: https://firms.modaps.eosdis.nasa.gov/api/area/
+    """
     if not settings.nasa_firms_map_key or settings.nasa_firms_map_key == "DEMO_KEY":
-        raise HTTPException(status_code=503, detail="NASA FIRMS MAP_KEY not configured")
+        return {"count": 0, "days": days, "data": [], "info": "Add NASA_FIRMS_MAP_KEY to .env for fire data"}
     async with NASAFIRMSConnector() as firms:
         fires = await firms.get_fires_gulf_coast(days=days)
     return {"count": len(fires), "days": days, "data": [f.model_dump() for f in fires]}
@@ -40,7 +43,7 @@ async def fires_bbox(
 ) -> dict:
     """NASA FIRMS fire detections for a bounding box."""
     if not settings.nasa_firms_map_key or settings.nasa_firms_map_key == "DEMO_KEY":
-        raise HTTPException(status_code=503, detail="NASA FIRMS MAP_KEY not configured")
+        return {"count": 0, "data": [], "info": "Add NASA_FIRMS_MAP_KEY to .env for fire data"}
     async with NASAFIRMSConnector() as firms:
         fires = await firms.get_fires_for_bbox(min_lat, min_lon, max_lat, max_lon, days=days)
     return {"count": len(fires), "data": [f.model_dump() for f in fires]}
